@@ -6,7 +6,12 @@
       </ion-toolbar>
     </ion-header>
     <ion-content>
-      <ChatList v-for="item of [1, 2, 3, 4, 5]" :key="item" v-show="loaded" />
+      <ChatList
+        v-for="item of users"
+        :key="item"
+        :user="item"
+        v-show="loaded"
+      />
       <ion-spinner name="lines" v-show="!loaded"></ion-spinner>
       <ion-fab
         vertical="bottom"
@@ -30,7 +35,6 @@ import {
   IonSpinner,
   IonIcon,
   IonFab,
-  modalController,
   IonFabButton,
   IonTitle,
   IonContent,
@@ -38,6 +42,8 @@ import {
 import ChatList from "@/components/chatList.vue";
 import { chatboxOutline } from "ionicons/icons";
 import { ref, defineComponent } from "vue";
+import { useStore } from "vuex";
+import { getChatList } from "@/services/firebaseService";
 
 export default defineComponent({
   name: "Chat",
@@ -55,14 +61,29 @@ export default defineComponent({
   },
 
   setup() {
+    const store = useStore();
+    const chatList: any = ref([]);
     const loaded = ref(false);
 
-    setTimeout(() => {
-      loaded.value = true;
-    }, 2000);
+    const List = async () => {
+      // const user = store.getters.currentUser();
+      const data = await getChatList("1330GC018");
+      data.onSnapshot((query) => {
+        const list: any = [];
+        query.forEach((doc) => {
+          list.push(doc.data());
+        });
+        chatList.value = list;
+        loaded.value = true;
+      });
+    };
+
+    List();
+
     return {
       chatboxOutline,
       loaded,
+      chatList,
     };
   },
 });

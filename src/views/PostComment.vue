@@ -13,8 +13,8 @@
       </ion-toolbar>
     </ion-header>
     <ion-content>
-      <PostCard />
-      <CommentCard />
+      <PostCard :post="post" />
+      <!-- <CommentCard /> -->
 
       <ion-infinite-scroll threshold="25%" @ionInfinite="loadData($event)">
         <ion-infinite-scroll-content
@@ -45,17 +45,19 @@ import {
   IonInfiniteScrollContent,
   IonContent,
 } from "@ionic/vue";
-import { defineComponent, ref } from "vue";
-import CommentCard from "@/components/CommentCard.vue";
+import { computed, defineComponent, ref } from "vue";
+// import CommentCard from "@/components/CommentCard.vue";
 import PostCard from "@/components/PostCard.vue";
 import InputBox from "@/components/InputBox.vue";
 import { arrowBackOutline } from "ionicons/icons";
+import { useRoute } from "vue-router";
+import { useStore } from "vuex";
 
 export default defineComponent({
   name: "Home",
   components: {
     IonHeader,
-    CommentCard,
+    // CommentCard,
     PostCard,
     IonFooter,
     IonButtons,
@@ -69,17 +71,26 @@ export default defineComponent({
     IonPage,
   },
   setup() {
-    const posts = ref([1, 2, 3, 4]);
+    const store = useStore();
+    const route = useRoute();
+    //  const router = useRouter();
+    //store.dispatch("news");
+    const postId = route.params.uuid;
+    console.log("post detail===>", postId);
+    const post = computed(() => {
+      return store.getters.post(postId);
+    });
+
     const loadData = (ev: any) => {
       setTimeout(() => {
         ev.target.complete();
-        posts.value.push(2, 3, 5);
+        // posts.value.push(2, 3, 5);
       }, 1000);
     };
     return {
       arrowBackOutline,
       loadData,
-      posts,
+      post,
     };
   },
 });

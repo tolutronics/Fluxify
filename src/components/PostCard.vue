@@ -1,30 +1,27 @@
 <template>
   <div id="container">
     <ion-card class="main">
-      <h3 v-if="face" class="ion-padding-start">
-        Face of the week 🎊🎊🎊🎊🎊🎊
-      </h3>
       <ion-card-header>
         <ion-avatar v-if="!face">
-          <img src="@/assets/tolu.jpeg" />
+          <img :src="posterImage" />
         </ion-avatar>
         <div>
           <ion-card-subtitle class="ion-text-capitalize"
             >Nov 12 2021. 12:30pm</ion-card-subtitle
           >
-          <ion-card-title
-            >Tolulope Adeniyi <span v-if="face">🎉🎉</span></ion-card-title
+          <ion-card-title v-if="face">
+            <span>🎉🎉{{ post.title }}🎉🎉</span></ion-card-title
           >
+          <ion-card-title v-if="!face">{{ posterName }} </ion-card-title>
         </div>
       </ion-card-header>
-      <ion-card-content :router-link="`/post/${1}`">
+      <ion-card-content :router-link="face ? '/post/face' : `/post/${post.id}`">
         <p>
-          Lorem ipsum dolor adipisicing elit. Nihil, debitis sit amet
-          consectetur adipisicing elit. Nihil, debitis.
+          {{ post.text }}
         </p>
 
-        <div class="imageContainer">
-          <img src="@/assets/tolu.jpeg" />
+        <div class="imageContainer" v-if="post.photourl">
+          <img :src="post.photourl" />
         </div>
       </ion-card-content>
       <ion-card lines="none" class="card-footer">
@@ -45,7 +42,7 @@
             v-if="isLiked"
             slot="start"
           ></ion-icon>
-          <span slot="start" class="likeCount">{{ 1098 }}</span>
+          <span slot="start" class="likeCount">{{ likeCount }}</span>
         </div>
 
         <div>
@@ -54,7 +51,7 @@
             class="darktheme"
             :icon="shareSocial"
           ></ion-icon>
-          <span class="likeCount">{{ 300 }}</span>
+          <span class="likeCount">{{ commentCount }}</span>
         </div>
 
         <div>
@@ -64,7 +61,7 @@
             :icon="chatbubbleOutline"
             slot="end"
           ></ion-icon>
-          <span slot="end" class="likeCount">{{ 500 }}</span>
+          <span slot="end" class="likeCount">{{ commentCount }}</span>
         </div>
       </ion-card>
     </ion-card>
@@ -87,11 +84,13 @@ import {
   IonIcon,
   IonCardTitle,
 } from "@ionic/vue";
-import { ref, defineComponent } from "vue";
+import { ref, defineComponent, computed } from "vue";
+import { useStore } from "vuex";
 export default defineComponent({
   name: "Posts",
   props: {
     face: Boolean,
+    post: {},
   },
   components: {
     IonCard,
@@ -102,18 +101,37 @@ export default defineComponent({
     IonCardContent,
     IonIcon,
   },
-  setup() {
+  setup(props) {
     const isLiked = ref(false);
+    const store = useStore();
 
     const likeToggle = () => {
       isLiked.value = !isLiked.value;
     };
+
+    const posterName = computed(() => {
+      return store.getters.posterName(props.post);
+    });
+    const posterImage = computed(() => {
+      return store.getters.posterImage(props.post);
+    });
+    const commentCount = computed(() => {
+      return 30;
+    });
+    const likeCount = computed(() => {
+      return 10;
+    });
+
     return {
       heartOutline,
       chatbubbleOutline,
       heart,
       shareSocial,
+      posterName,
+      posterImage,
+      commentCount,
       likeToggle,
+      likeCount,
       isLiked,
     };
   },
@@ -147,6 +165,7 @@ ion-card-title {
 }
 ion-card-content > p {
   padding: 0 0 5px 10px;
+  font-size: 16px;
 }
 
 ion-card-header > ion-avatar {

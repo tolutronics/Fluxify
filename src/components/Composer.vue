@@ -1,73 +1,11 @@
 <template>
   <div id="container">
-    <ion-card class="main">
-      <h3 v-if="face" class="ion-padding-start">
-        Face of the week 🎊🎊🎊🎊🎊🎊
-      </h3>
-      <ion-card-header>
-        <ion-avatar v-if="!face">
-          <img src="@/assets/tolu.jpeg" />
-        </ion-avatar>
-        <div>
-          <ion-card-subtitle class="ion-text-capitalize"
-            >Nov 12 2021. 12:30pm</ion-card-subtitle
-          >
-          <ion-card-title
-            >Tolulope Adeniyi <span v-if="face">🎉🎉</span></ion-card-title
-          >
-        </div>
-      </ion-card-header>
-      <ion-card-content :router-link="`/post/${1}`">
-        <p>
-          Lorem ipsum dolor adipisicing elit. Nihil, debitis sit amet
-          consectetur adipisicing elit. Nihil, debitis.
-        </p>
-
-        <div class="imageContainer">
-          <img src="@/assets/tolu.jpeg" />
-        </div>
-      </ion-card-content>
-      <ion-card lines="none" class="card-footer">
-        <div>
-          <ion-icon
-            size="small"
-            :icon="heartOutline"
-            class="unlike"
-            v-if="!isLiked"
-            v-on:click="likeToggle"
-            slot="start"
-          ></ion-icon>
-          <ion-icon
-            size="small"
-            :icon="heart"
-            class="like"
-            v-on:click="likeToggle"
-            v-if="isLiked"
-            slot="start"
-          ></ion-icon>
-          <span slot="start" class="likeCount">{{ 1098 }}</span>
-        </div>
-
-        <div>
-          <ion-icon
-            size="small"
-            class="darktheme"
-            :icon="shareSocial"
-          ></ion-icon>
-          <span class="likeCount">{{ 300 }}</span>
-        </div>
-
-        <div>
-          <ion-icon
-            size="small"
-            class="darktheme"
-            :icon="chatbubbleOutline"
-            slot="end"
-          ></ion-icon>
-          <span slot="end" class="likeCount">{{ 500 }}</span>
-        </div>
-      </ion-card>
-    </ion-card>
+    <ion-header>
+      <ion-toolbar class="ion-padding-start ion-padding-end">
+        <ion-label slot="start" @click="close">Close</ion-label>
+        <ion-label slot="end">Post</ion-label>
+      </ion-toolbar>
+    </ion-header>
   </div>
 </template>
 
@@ -78,15 +16,7 @@ import {
   heart,
   shareSocial,
 } from "ionicons/icons";
-import {
-  IonCard,
-  IonAvatar,
-  IonCardSubtitle,
-  IonCardContent,
-  IonCardHeader,
-  IonIcon,
-  IonCardTitle,
-} from "@ionic/vue";
+import { IonLabel, IonToolbar, IonHeader, modalController } from "@ionic/vue";
 import { ref, defineComponent } from "vue";
 export default defineComponent({
   name: "Posts",
@@ -94,13 +24,9 @@ export default defineComponent({
     face: Boolean,
   },
   components: {
-    IonCard,
-    IonCardSubtitle,
-    IonAvatar,
-    IonCardHeader,
-    IonCardTitle,
-    IonCardContent,
-    IonIcon,
+    IonLabel,
+    IonToolbar,
+    IonHeader,
   },
   setup() {
     const isLiked = ref(false);
@@ -108,11 +34,15 @@ export default defineComponent({
     const likeToggle = () => {
       isLiked.value = !isLiked.value;
     };
+    const close = async () => {
+      await modalController.dismiss();
+    };
     return {
       heartOutline,
       chatbubbleOutline,
       heart,
       shareSocial,
+      close,
       likeToggle,
       isLiked,
     };

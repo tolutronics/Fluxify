@@ -1,0 +1,17 @@
+import { Post } from "@/types/posts";
+
+export const postsMutations = {
+  setPosts(state: any, posts: Post[]) {
+    state.posts = posts;
+  },
+  addPosts(state: any, posts: Post[]) {
+    const newArr = [];
+    for (const property in state.posts) {
+      newArr.push(state.posts[property]);
+    }
+    posts.forEach((item) => {
+      newArr.push(item);
+    });
+    state.posts = newArr;
+  },
+};

@@ -6,8 +6,8 @@
           <img src="@/assets/tolu.jpeg" />
         </ion-avatar>
         <ion-label @click="viewProfile">
-          <p>13/30GC018</p>
-          <h2>Tolulope Adeniyi</h2>
+          <p>{{ user.matric }}</p>
+          <h2>{{ user.firstname + " " + user.lastname }}</h2>
           <p>Hello, how are you</p>
         </ion-label>
       </ion-item>
@@ -27,6 +27,9 @@ import {
 import ProfileView from "@/components/ProfileView.vue";
 export default defineComponent({
   name: "Chat",
+  props: {
+    user: {},
+  },
   components: {
     IonList,
     IonItem,
@@ -35,7 +38,7 @@ export default defineComponent({
     IonLabel,
   },
 
-  setup() {
+  setup(props) {
     const viewProfile = async () => {
       const modal = await modalController.create({
         component: ProfileView,

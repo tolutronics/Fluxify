@@ -7,12 +7,16 @@
 <script lang="ts">
 import { IonApp, IonRouterOutlet } from "@ionic/vue";
 import { defineComponent } from "vue";
-
+import { useStore } from "vuex";
 export default defineComponent({
   name: "App",
   components: {
     IonApp,
     IonRouterOutlet,
+  },
+  setup() {
+    const store = useStore();
+    store.dispatch("users");
   },
 });
 </script>
