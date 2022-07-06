@@ -7,7 +7,7 @@
     </ion-header>
     <ion-content>
       <ChatList
-        v-for="item of users"
+        v-for="item of chatList"
         :key="item"
         :user="item"
         v-show="loaded"
@@ -28,36 +28,18 @@
 </template>
 
 <script lang="ts">
-import {
-  IonPage,
-  IonHeader,
-  IonToolbar,
-  IonSpinner,
-  IonIcon,
-  IonFab,
-  IonFabButton,
-  IonTitle,
-  IonContent,
-} from "@ionic/vue";
 import ChatList from "@/components/chatList.vue";
 import { chatboxOutline } from "ionicons/icons";
 import { ref, defineComponent } from "vue";
 import { useStore } from "vuex";
 import { getChatList } from "@/services/firebaseService";
+import commonIonicComponents from "@/shared/common-ionic-components";
 
 export default defineComponent({
   name: "Chat",
   components: {
-    IonHeader,
-    IonToolbar,
+    ...commonIonicComponents,
     ChatList,
-    IonSpinner,
-    IonIcon,
-    IonFab,
-    IonFabButton,
-    IonTitle,
-    IonContent,
-    IonPage,
   },
 
   setup() {
@@ -66,7 +48,7 @@ export default defineComponent({
     const loaded = ref(false);
 
     const List = async () => {
-      // const user = store.getters.currentUser();
+      const user = store.getters.currentUser();
       const data = await getChatList("1330GC018");
       data.onSnapshot((query) => {
         const list: any = [];

@@ -60,27 +60,13 @@
 </template>
 
 <script lang="ts">
-import {
-  IonPage,
-  IonGrid,
-  IonCard,
-  IonRow,
-  IonCol,
-  IonIcon,
-  IonContent,
-} from "@ionic/vue";
 import { logoLinkedin, logoInstagram, logoTwitter } from "ionicons/icons";
+import commonIonicComponents from "@/shared/common-ionic-components";
 
 export default {
   name: "Profile",
   components: {
-    IonContent,
-    IonCard,
-    IonRow,
-    IonCol,
-    IonIcon,
-    IonGrid,
-    IonPage,
+    ...commonIonicComponents,
   },
   setup() {
     return {

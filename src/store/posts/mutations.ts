@@ -4,6 +4,9 @@ export const postsMutations = {
   setPosts(state: any, posts: Post[]) {
     state.posts = posts;
   },
+  setFacePost(state: any, facePost: Post) {
+    state.facePost = facePost;
+  },
   addPosts(state: any, posts: Post[]) {
     const newArr = [];
     for (const property in state.posts) {

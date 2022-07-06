@@ -23,32 +23,19 @@
 </template>
 
 <script lang="ts">
-import {
-  IonTabBar,
-  IonTabButton,
-  IonTabs,
-  IonLabel,
-  IonIcon,
-  IonPage,
-  IonRouterOutlet,
-} from "@ionic/vue";
+import {} from "@ionic/vue";
 import {
   home,
   peopleOutline,
   chatbubbleOutline,
   personOutline,
 } from "ionicons/icons";
+import commonIonicComponents from "@/shared/common-ionic-components";
 
 export default {
   name: "Tabs",
   components: {
-    IonLabel,
-    IonTabs,
-    IonTabBar,
-    IonTabButton,
-    IonIcon,
-    IonPage,
-    IonRouterOutlet,
+    ...commonIonicComponents,
   },
   setup() {
     return {

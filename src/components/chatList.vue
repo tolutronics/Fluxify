@@ -2,10 +2,10 @@
   <div id="container">
     <ion-list>
       <ion-item>
-        <ion-avatar>
+        <ion-avatar @click="viewProfile">
           <img src="@/assets/tolu.jpeg" />
         </ion-avatar>
-        <ion-label @click="viewProfile">
+        <ion-label>
           <p>{{ user.matric }}</p>
           <h2>{{ user.firstname + " " + user.lastname }}</h2>
           <p>Hello, how are you</p>
@@ -16,7 +16,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, onMounted } from "vue";
 import {
   IonList,
   IonItem,
@@ -25,6 +25,7 @@ import {
   modalController,
 } from "@ionic/vue";
 import ProfileView from "@/components/ProfileView.vue";
+import { useStore } from "vuex";
 export default defineComponent({
   name: "Chat",
   props: {
@@ -49,6 +50,7 @@ export default defineComponent({
       });
       await modal.present();
     };
+
     return {
       viewProfile,
     };

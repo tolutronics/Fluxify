@@ -13,7 +13,8 @@
       </ion-toolbar>
     </ion-header>
     <ion-content>
-      <PostCard :post="post" />
+      <PostCard :post="post" :face="true" v-if="postId == 'face'" />
+      <PostCard :post="post" :face="false" v-else />
       <!-- <CommentCard /> -->
 
       <ion-infinite-scroll threshold="25%" @ionInfinite="loadData($event)">
@@ -33,18 +34,6 @@
 </template>
 
 <script lang="ts">
-import {
-  IonPage,
-  IonHeader,
-  IonButtons,
-  IonBackButton,
-  IonTitle,
-  IonToolbar,
-  IonFooter,
-  IonInfiniteScroll,
-  IonInfiniteScrollContent,
-  IonContent,
-} from "@ionic/vue";
 import { computed, defineComponent, ref } from "vue";
 // import CommentCard from "@/components/CommentCard.vue";
 import PostCard from "@/components/PostCard.vue";
@@ -52,23 +41,14 @@ import InputBox from "@/components/InputBox.vue";
 import { arrowBackOutline } from "ionicons/icons";
 import { useRoute } from "vue-router";
 import { useStore } from "vuex";
+import commonIonicComponents from "@/shared/common-ionic-components";
 
 export default defineComponent({
   name: "Home",
   components: {
-    IonHeader,
-    // CommentCard,
     PostCard,
-    IonFooter,
-    IonButtons,
-    IonBackButton,
-    IonInfiniteScroll,
     InputBox,
-    IonInfiniteScrollContent,
-    IonTitle,
-    IonToolbar,
-    IonContent,
-    IonPage,
+    ...commonIonicComponents,
   },
   setup() {
     const store = useStore();
@@ -76,7 +56,6 @@ export default defineComponent({
     //  const router = useRouter();
     //store.dispatch("news");
     const postId = route.params.uuid;
-    console.log("post detail===>", postId);
     const post = computed(() => {
       return store.getters.post(postId);
     });
@@ -90,6 +69,7 @@ export default defineComponent({
     return {
       arrowBackOutline,
       loadData,
+      postId,
       post,
     };
   },

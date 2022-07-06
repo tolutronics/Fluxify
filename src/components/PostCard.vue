@@ -3,7 +3,12 @@
     <ion-card class="main">
       <ion-card-header>
         <ion-avatar v-if="!face">
-          <img :src="posterImage" />
+          <img v-if="post.photourl" :src="posterImage" />
+          <img v-if="!post.photourl" src="@/assets/male.png" />
+        </ion-avatar>
+        <ion-avatar v-else>
+          <img src="@/assets/male.png" />
+          <!---admin image--->
         </ion-avatar>
         <div>
           <ion-card-subtitle class="ion-text-capitalize"
@@ -84,13 +89,17 @@ import {
   IonIcon,
   IonCardTitle,
 } from "@ionic/vue";
-import { ref, defineComponent, computed } from "vue";
+import { ref, defineComponent, computed, PropType } from "vue";
 import { useStore } from "vuex";
+import { Post } from "@/types/Posts";
 export default defineComponent({
   name: "Posts",
   props: {
     face: Boolean,
-    post: {},
+    post: {
+      type: Object as PropType<Post>,
+      default: {} as Post,
+    },
   },
   components: {
     IonCard,
@@ -104,6 +113,7 @@ export default defineComponent({
   setup(props) {
     const isLiked = ref(false);
     const store = useStore();
+    console.log(props.post);
 
     const likeToggle = () => {
       isLiked.value = !isLiked.value;

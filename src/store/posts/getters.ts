@@ -4,13 +4,18 @@ import { Post } from "@/types/posts";
 export const postsGetters = {
   post(state: any) {
     return (postId: string) => {
-      const post = state.posts.find((post: Post) => post.id === postId);
-
-      return post;
+      console.log("passed id", postId);
+      console.log(state.facePost);
+      if (postId !== "face")
+        return state.posts.find((post: Post) => post.id === postId);
+      else return state.facePost;
     };
   },
   posts(state: any) {
     return state.posts;
+  },
+  facePosts(state: any) {
+    return state.facePost;
   },
   posterName(state: any) {
     return (post: Post) => {

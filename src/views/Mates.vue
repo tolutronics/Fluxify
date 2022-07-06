@@ -9,18 +9,24 @@
             :default-href="'/tabs/tab2'"
           ></ion-back-button>
         </ion-buttons>
+        <ion-title>My Mates</ion-title>
       </ion-toolbar>
+      <ion-searchbar
+        placeholder="Name / matric number"
+        @ionChange="onSearchChange($event)"
+      ></ion-searchbar>
     </ion-header>
     <ion-content>
       <ion-list>
-        <ion-item v-for="item of [1, 2, 3, 4, 5]" :key="item">
-          <ion-avatar>
-            <img src="@/assets/tolu.jpeg" />
+        <ion-item v-for="user of users" :key="user">
+          <ion-avatar @click="viewProfile">
+            <img v-if="user.photourl" :src="user.photourl" />
+            <img v-if="!user.photourl" src="@/assets/male.png" />
           </ion-avatar>
-          <ion-label @click="viewProfile">
-            <p>13/30GC018</p>
-            <h2>Tolulope Adeniyi</h2>
-            <p>Hello, how are you</p>
+          <ion-label :router-link="`/chat/${user.matric}`">
+            <h2>{{ user.firstname }} {{ user.lastname }}</h2>
+            <p>{{ user.matric }}</p>
+            <!-- <p>Hello, how are you</p> -->
           </ion-label>
         </ion-item>
       </ion-list>
@@ -29,38 +35,25 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, ref } from "vue";
 import { arrowBackOutline } from "ionicons/icons";
-import {
-  IonList,
-  IonItem,
-  IonAvatar,
-  IonPage,
-  IonBackButton,
-  IonButtons,
-  IonHeader,
-  IonToolbar,
-  IonContent,
-  IonLabel,
-  modalController,
-} from "@ionic/vue";
+import { modalController, onIonViewWillEnter } from "@ionic/vue";
 import ProfileView from "@/components/ProfileView.vue";
+import { useStore } from "vuex";
+import { User } from "@/types/users";
+import CommonIonicComponents from "@/shared/common-ionic-components";
 export default defineComponent({
   name: "Mates",
   components: {
-    IonList,
-    IonItem,
-    IonContent,
-    IonBackButton,
-    IonHeader,
-    IonToolbar,
-    IonButtons,
-    IonPage,
-    IonAvatar,
-    IonLabel,
+    ...CommonIonicComponents,
   },
 
   setup() {
+    const store = useStore();
+    const users = ref<User[]>([]);
+    const usersCopy = ref<User[]>([]);
+    users.value = store.getters.users;
+    usersCopy.value = store.getters.users;
     const viewProfile = async () => {
       const modal = await modalController.create({
         component: ProfileView,
@@ -71,8 +64,40 @@ export default defineComponent({
       });
       await modal.present();
     };
+
+    const initializeItems = () => {
+      users.value = usersCopy.value;
+    };
+
+    const onSearchChange = (evt: any) => {
+      initializeItems();
+
+      const searchTerm = evt.srcElement.value;
+
+      if (!searchTerm) {
+        return;
+      }
+
+      users.value = usersCopy.value.filter((user) => {
+        if (user && searchTerm) {
+          if (
+            user.firstname.toLowerCase().indexOf(searchTerm.toLowerCase()) >
+              -1 ||
+            user.lastname.toLowerCase().indexOf(searchTerm.toLowerCase()) >
+              -1 ||
+            user.matric.toLowerCase().indexOf(searchTerm.toLowerCase()) > -1
+          ) {
+            return true;
+          }
+          return false;
+        }
+      });
+    };
+
     return {
       viewProfile,
+      onSearchChange,
+      users,
       arrowBackOutline,
     };
   },

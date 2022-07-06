@@ -20,6 +20,8 @@ const store = createStore({
     posts: [] as Post[],
     users: [] as User[],
     likes: [] as Like[],
+    facePost: {} as Post,
+    currentUser: {} as User,
   },
   getters: {
     ...postsGetters,

@@ -5,7 +5,12 @@ import Tabs from "../views/Tabs.vue";
 const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
-    redirect: "/tabs/tab1",
+    redirect: "login",
+  },
+
+  {
+    path: "/login",
+    component: () => import("../views/Login.vue"),
   },
   {
     path: "/mates",
@@ -14,6 +19,10 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: "/post/:uuid",
     component: () => import("../views/PostComment.vue"),
+  },
+  {
+    path: "/chat/:uuid",
+    component: () => import("../views/Chat.vue"),
   },
   {
     path: "/tabs/",
