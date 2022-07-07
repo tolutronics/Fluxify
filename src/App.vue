@@ -36,4 +36,11 @@ p {
 p {
   color: #363535;
 }
+
+.mosha__toast {
+  border-radius: 0 !important;
+  top: 0 !important;
+  max-width: 100% !important;
+  width: 100vw !important;
+}
 </style>

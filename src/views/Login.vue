@@ -9,9 +9,21 @@
       </ion-item>
       <ion-item :fill="'outline'" :mode="'md'">
         <ion-label position="floating">Password</ion-label>
-        <ion-input type="text" autocomplete="off" autocorrect="off"></ion-input>
+        <ion-input
+          type="password"
+          autocomplete="off"
+          autocorrect="off"
+        ></ion-input>
       </ion-item>
-      <ion-button :expand="'block'" :color="'secondary'"> Login </ion-button>
+      <ion-button
+        :disabled="loading"
+        :expand="'block'"
+        :color="'secondary'"
+        @click="login"
+      >
+        <span v-if="!loading">Login</span>
+        <ion-spinner v-if="loading" name="lines"></ion-spinner>
+      </ion-button>
     </ion-content>
     <ion-footer class="ion-no-border">
       <ion-toolbar color="primary" class="ion-text-center">
@@ -25,6 +37,7 @@
 import { ref, defineComponent } from "vue";
 import commonIonicComponents from "@/shared/common-ionic-components";
 import { useStore } from "vuex";
+import { createToast } from "mosha-vue-toastify";
 
 export default defineComponent({
   name: "Login",
@@ -34,8 +47,12 @@ export default defineComponent({
 
   setup() {
     const store = useStore();
-
-    return {};
+    const loading = ref(false);
+    const login = () => {
+      loading.value = true;
+      createToast("Wow, easy");
+    };
+    return { loading, login };
   },
 });
 </script>
@@ -68,7 +85,7 @@ ion-button {
 h1 {
   font-family: "poppins";
   font-weight: 700;
-  font-size: 2.3em;
+  font-size: 2em;
   margin-bottom: 20px;
 }
 ion-item {
