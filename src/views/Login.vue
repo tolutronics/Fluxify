@@ -3,9 +3,21 @@
     <ion-content color="primary" class="ion-padding">
       <div id="top-content"></div>
       <h1 class="ion-text-center">Connect with your school mates</h1>
-      <ion-input type="text" placeholder="Awesome Input"></ion-input>
+      <ion-item :fill="'outline'" :mode="'md'">
+        <ion-label position="floating">Matric Number</ion-label>
+        <ion-input type="text" autocomplete="off" autocorrect="off"></ion-input>
+      </ion-item>
+      <ion-item :fill="'outline'" :mode="'md'">
+        <ion-label position="floating">Password</ion-label>
+        <ion-input type="text" autocomplete="off" autocorrect="off"></ion-input>
+      </ion-item>
       <ion-button :expand="'block'" :color="'secondary'"> Login </ion-button>
     </ion-content>
+    <ion-footer class="ion-no-border">
+      <ion-toolbar color="primary" class="ion-text-center">
+        Ele18 2022
+      </ion-toolbar>
+    </ion-footer>
   </ion-page>
 </template>
 
@@ -35,11 +47,36 @@ export default defineComponent({
   height: 30vh;
   opacity: 0.8;
 }
-ion-button {
+ion-input {
+  font-weight: 600;
 }
+ion-button {
+  margin-top: 20px;
+  height: 55px;
+  margin-left: 0;
+  margin-right: 0;
+}
+.item-has-focus ion-label {
+  color: #fff !important;
+}
+.item-has-focus {
+  --border-color: #fff !important;
+  --background: transparent;
+  --highlight-background: #fff;
+}
+
 h1 {
   font-family: "poppins";
   font-weight: 700;
   font-size: 2.3em;
+  margin-bottom: 20px;
+}
+ion-item {
+  --ion-item-background: var(--ion-color-primary);
+  margin-bottom: 20px;
+  --border-color: #fff !important;
+}
+ion-item::part(native) {
+  border-radius: 10px;
 }
 </style>

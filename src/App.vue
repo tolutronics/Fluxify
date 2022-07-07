@@ -22,16 +22,16 @@ export default defineComponent({
 </script>
 <style>
 .ios {
-  font-family: "alegreya";
+  font-family: "poppins";
 }
 .md {
-  font-family: "alegreya";
+  font-family: "poppins";
 }
 h1,
 h2,
 h3,
 p {
-  font-family: "alegreya";
+  font-family: "poppins";
 }
 p {
   color: #363535;

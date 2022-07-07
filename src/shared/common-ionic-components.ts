@@ -28,6 +28,8 @@ import {
   IonCheckbox,
   IonChip,
   IonSearchbar,
+  IonInput,
+  IonButton,
 } from "@ionic/vue";
 
 export default {
@@ -60,4 +62,6 @@ export default {
   IonCheckbox,
   IonChip,
   IonSearchbar,
+  IonInput,
+  IonButton,
 };
