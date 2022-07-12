@@ -6,104 +6,101 @@
         <ion-label slot="end">Post</ion-label>
       </ion-toolbar>
     </ion-header>
+    <ion-content>
+      <ion-grid fixed>
+        <ion-row>
+          <ion-col size="2">
+            <ion-row>
+              <ion-col size="12">
+                <ion-icon :icon="image" class="options"></ion-icon>
+              </ion-col>
+              <ion-col size="12">
+                <ion-icon :icon="camera" class="options"></ion-icon>
+              </ion-col>
+              <ion-col size="12">
+                <ion-icon :icon="location" class="options"></ion-icon>
+              </ion-col>
+              <ion-col size="12">
+                <ion-icon :icon="videocam" class="options"></ion-icon>
+              </ion-col>
+            </ion-row>
+          </ion-col>
+          <ion-col size="10">
+            <ion-textarea
+              :auto-grow="true"
+              :autofocus="true"
+              placeholder="What's on your mind"
+            ></ion-textarea>
+            <ion-row>
+              <ion-col
+                class="ion-no-padding"
+                :size="img > 1 ? 6 : 12"
+                v-for="item in img"
+                :key="item"
+              >
+                <img
+                  class="postImage"
+                  :class="img > 1 ? 'multiple' : 'single'"
+                  src="@/assets/tolu.jpeg"
+                  alt=""
+                  srcset=""
+                />
+              </ion-col>
+            </ion-row>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-content>
   </div>
 </template>
 
 <script lang="ts">
-import {
-  heartOutline,
-  chatbubbleOutline,
-  heart,
-  shareSocial,
-} from "ionicons/icons";
-import { IonLabel, IonToolbar, IonHeader, modalController } from "@ionic/vue";
+import { image, location, videocam, camera } from "ionicons/icons";
+import { modalController } from "@ionic/vue";
 import { ref, defineComponent } from "vue";
+import commonIonicComponents from "@/shared/common-ionic-components";
 export default defineComponent({
   name: "Posts",
-  props: {
-    face: Boolean,
-  },
   components: {
-    IonLabel,
-    IonToolbar,
-    IonHeader,
+    ...commonIonicComponents,
   },
   setup() {
-    const isLiked = ref(false);
-
-    const likeToggle = () => {
-      isLiked.value = !isLiked.value;
-    };
+    const img = 1;
     const close = async () => {
       await modalController.dismiss();
     };
     return {
-      heartOutline,
-      chatbubbleOutline,
-      heart,
-      shareSocial,
       close,
-      likeToggle,
-      isLiked,
+      image,
+      camera,
+      location,
+      img,
+      videocam,
     };
   },
 });
 </script>
 
 <style scoped>
-.unlike {
-  /* background: red;
-  padding: 2px;
-  border-radius: 50%; */
+ion-content {
+  height: 100vh;
 }
-ion-card:first-of-type {
-  margin-top: 0 !important;
+ion-icon.options {
+  font-size: 25px;
+  border-radius: 50%;
+  background: rgb(89, 104, 241);
+  padding: 5px;
+  color: #fff;
 }
-ion-card.main {
-  margin: 0;
-  box-shadow: none;
-  border-bottom: 1px solid var(--ion-border-color);
-  background: transparent;
-  border-radius: 0;
+.single {
+  height: 200px;
 }
-ion-icon {
-  margin-right: 5px;
+.multiple {
+  height: 150px;
 }
-ion-card-header {
-  display: flex;
-}
-ion-card-title {
-  font-size: 20px;
-}
-ion-card-content > p {
-  padding: 0 0 5px 10px;
-}
-
-ion-card-header > ion-avatar {
-  margin-right: 10px;
-}
-.imageContainer {
-  max-height: 200px;
-  border-radius: 10px;
-  width: 100%;
-  object-fit: cover;
-}
-.imageContainer > img {
-  height: inherit;
+img.postImage {
   width: 100%;
   border-radius: 10px;
   object-fit: cover;
-  max-height: 200px;
-}
-ion-card.card-footer {
-  display: flex;
-  margin: 0;
-  justify-content: space-around;
-  background: transparent;
-  box-shadow: none;
-  padding-bottom: 10px;
-}
-ion-card.card-footer > div {
-  display: flex;
 }
 </style>

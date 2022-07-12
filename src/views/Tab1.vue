@@ -2,7 +2,20 @@
   <ion-page>
     <ion-header class="ion-no-border">
       <ion-toolbar>
-        <img class="simg" slot="start" alt="" src="@/assets/tolu.jpeg" />
+        <img
+          v-if="!currentUser.photourl"
+          class="simg"
+          slot="start"
+          alt=""
+          src="@/assets/male.png"
+        />
+        <img
+          v-if="currentUser.photourl"
+          class="simg"
+          slot="start"
+          alt=""
+          :src="currentUser.photourl"
+        />
         <ion-title>Fluxify</ion-title>
 
         <ion-icon
@@ -26,15 +39,9 @@
           <ion-label>Update</ion-label>
         </ion-chip>
       </ion-item>
-      <PostCard :post="facePosts" :face="true" v-if="faceLoading == false" />
+      <!-- <PostCard :post="facePosts" :face="true" v-if="faceLoading == false" /> -->
       <ion-spinner name="circular" v-if="loading == true"></ion-spinner>
-      <PostCard
-        v-for="item of posts"
-        :key="item"
-        :post="item"
-        :face="false"
-        v-show="loading == false"
-      />
+      <PostCard v-for="item of posts" :key="item" :post="item" :face="false" />
 
       <ion-infinite-scroll threshold="25%" @ionInfinite="loadData($event)">
         <ion-infinite-scroll-content
@@ -61,6 +68,8 @@ import {
 } from "@/services/firebaseService";
 import { useStore } from "vuex";
 import commonIonicComponents from "@/shared/common-ionic-components";
+import { User } from "@/types/users";
+import { onSnapshot } from "firebase/firestore";
 
 export default defineComponent({
   name: "Home",
@@ -76,7 +85,8 @@ export default defineComponent({
     const noPost = ref(true);
     const facePosts = ref();
     const faceLoading = ref(true);
-
+    const currentUser: User = store.getters.currentUser;
+    console.log({ currentUser });
     const loadData = (ev: any) => {
       setTimeout(() => {
         ev.target.complete();
@@ -84,51 +94,69 @@ export default defineComponent({
       }, 1000);
     };
     const posts = computed(() => store.getters.posts);
-    // console.log(posts.value);
+    loading.value = false;
+    console.log("===>", posts.value);
 
     const fetchPosts = async () => {
       const data = await getAllPosts();
-      data.onSnapshot((query) => {
-        const newPosts: any = [];
-        query.forEach((doc) => {
-          const post = doc.data();
-          // newPosts.push(doc.data());
-          delete post.posterphoto;
-          delete post.name1;
-          delete post.name2;
-          post.userId = post.matric;
-          delete post.matric;
-          delete post.count;
-          // console.log(post);
-          // savePosts(post);
+      console.log("pstssssss", data);
+      const posts: any = [];
+      onSnapshot(data, async (snapshot: any) => {
+        snapshot.docChanges().forEach(async (change: any) => {
+          if (change.type === "added") {
+            // console.log("New city: ", change.doc.data());
+            posts.push(change.doc.data());
+          }
+          if (change.type === "modified") {
+            console.log("Modified city: ", change.doc.data());
+          }
+          if (change.type === "removed") {
+            console.log("Removed city: ", change.doc.data());
+          }
         });
-        // posts.value = newPosts;
+        console.log(posts);
       });
+      // data.onSnapshot((query) => {
+      //   const newPosts: any = [];
+      //   query.forEach((doc) => {
+      //     const post = doc.data();
+      //     // newPosts.push(doc.data());
+      //     delete post.posterphoto;
+      //     delete post.name1;
+      //     delete post.name2;
+      //     post.userId = post.matric;
+      //     delete post.matric;
+      //     delete post.count;
+      //     // console.log(post);
+      //     // savePosts(post);
+      //   });
+      //   // posts.value = newPosts;
+      // });
 
       loading.value = false;
     };
     // console.log(loading.value);
     watch(posts, (currentValue, oldValue) => {
       loading.value = false;
-      // console.log("done");
+      console.log("done");
       if (currentValue.length < 1) {
         noPost.value = true;
       }
     });
     const fetchFacePosts = async () => {
       const data = await getFacePosts();
-      data.onSnapshot((query) => {
-        const dummyFacePost: any = [];
-        query.forEach((doc) => {
-          dummyFacePost.push(doc.data());
-        });
-        facePosts.value = dummyFacePost[0];
-        // console.log("is here====>", facePosts.value);
-        faceLoading.value = false;
-        store.commit("setFacePost", facePosts.value);
-        console.log(facePosts.value);
-        console.log("faccee", store.getters.facePost);
-      });
+      // data.onSnapshot((query) => {
+      //   const dummyFacePost: any = [];
+      //   query.forEach((doc) => {
+      //     dummyFacePost.push(doc.data());
+      //   });
+      //   facePosts.value = dummyFacePost[0];
+      //   // console.log("is here====>", facePosts.value);
+      //   faceLoading.value = false;
+      //   store.commit("setFacePost", facePosts.value);
+      //   console.log(facePosts.value);
+      //   console.log("faccee", store.getters.facePost);
+      // });
     };
 
     // fetchUser();
@@ -153,6 +181,7 @@ export default defineComponent({
       faceLoading,
       facePosts,
       noPost,
+      currentUser,
       composePost,
       posts,
     };

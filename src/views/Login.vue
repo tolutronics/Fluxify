@@ -5,12 +5,18 @@
       <h1 class="ion-text-center">Connect with your school mates</h1>
       <ion-item :fill="'outline'" :mode="'md'">
         <ion-label position="floating">Matric Number</ion-label>
-        <ion-input type="text" autocomplete="off" autocorrect="off"></ion-input>
+        <ion-input
+          v-model="loginForm.matric"
+          type="text"
+          autocomplete="off"
+          autocorrect="off"
+        ></ion-input>
       </ion-item>
       <ion-item :fill="'outline'" :mode="'md'">
         <ion-label position="floating">Password</ion-label>
         <ion-input
           type="password"
+          v-model="loginForm.password"
           autocomplete="off"
           autocorrect="off"
         ></ion-input>
@@ -19,7 +25,7 @@
         :disabled="loading"
         :expand="'block'"
         :color="'secondary'"
-        @click="login"
+        @click="Login"
       >
         <span v-if="!loading">Login</span>
         <ion-spinner v-if="loading" name="lines"></ion-spinner>
@@ -34,10 +40,12 @@
 </template>
 
 <script lang="ts">
-import { ref, defineComponent } from "vue";
+import { ref, defineComponent, reactive } from "vue";
 import commonIonicComponents from "@/shared/common-ionic-components";
 import { useStore } from "vuex";
+import { useRouter } from "vue-router";
 import { createToast } from "mosha-vue-toastify";
+import { login } from "@/services/firebaseService";
 
 export default defineComponent({
   name: "Login",
@@ -46,13 +54,43 @@ export default defineComponent({
   },
 
   setup() {
+    const loginForm = reactive({
+      matric: "",
+      password: "",
+    });
     const store = useStore();
+    const router = useRouter();
     const loading = ref(false);
-    const login = () => {
+    const Login = async () => {
       loading.value = true;
-      createToast("Wow, easy");
+      try {
+        console.log(loginForm);
+        const { matric, password } = loginForm;
+        const result = await login(password, matric);
+        console.log("result here", result);
+        loading.value = false;
+        if (!result?.error) {
+          console.log("result===>", result?.data);
+          store.commit("setCurrentUser", result?.data);
+          createToast("Login Successful");
+
+          router.replace("/tabs");
+        } else {
+          createToast(result.msg);
+        }
+      } catch (error) {
+        loading.value = false;
+        console.log(error);
+        createToast("An error occured");
+      }
+
+      // if (result.error) {
+      //   createToast(result.msg);
+      // } else {
+      //   createToast(result.msg);
+      // }
     };
-    return { loading, login };
+    return { loading, Login, loginForm };
   },
 });
 </script>

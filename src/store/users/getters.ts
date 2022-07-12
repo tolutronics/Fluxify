@@ -12,4 +12,7 @@ export const usersGetters = {
     console.log(state.users);
     return state.users;
   },
+  currentUser(state: any) {
+    return state.currentUser;
+  },
 };

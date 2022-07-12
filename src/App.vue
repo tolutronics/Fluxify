@@ -17,6 +17,7 @@ export default defineComponent({
   setup() {
     const store = useStore();
     store.dispatch("users");
+    store.dispatch("posts");
   },
 });
 </script>

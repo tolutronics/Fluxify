@@ -34,6 +34,7 @@ import { ref, defineComponent } from "vue";
 import { useStore } from "vuex";
 import { getChatList } from "@/services/firebaseService";
 import commonIonicComponents from "@/shared/common-ionic-components";
+import { User } from "@/types/users";
 
 export default defineComponent({
   name: "Chat",
@@ -46,18 +47,17 @@ export default defineComponent({
     const store = useStore();
     const chatList: any = ref([]);
     const loaded = ref(false);
-
+    const currentUser: User = store.getters.currentUser;
     const List = async () => {
-      const user = store.getters.currentUser();
-      const data = await getChatList("1330GC018");
-      data.onSnapshot((query) => {
-        const list: any = [];
-        query.forEach((doc) => {
-          list.push(doc.data());
-        });
-        chatList.value = list;
-        loaded.value = true;
-      });
+      const data = await getChatList(currentUser.matric);
+      // data.onSnapshot((query) => {
+      //   const list: any = [];
+      //   query.forEach((doc) => {
+      //     list.push(doc.data());
+      //   });
+      //   chatList.value = list;
+      //   loaded.value = true;
+      // });
     };
 
     List();
@@ -65,6 +65,7 @@ export default defineComponent({
     return {
       chatboxOutline,
       loaded,
+      currentUser,
       chatList,
     };
   },
