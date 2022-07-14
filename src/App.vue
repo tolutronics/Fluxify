@@ -5,14 +5,42 @@
 </template>
 
 <script lang="ts">
-import { IonApp, IonRouterOutlet } from '@ionic/vue';
-import { defineComponent } from 'vue';
-
+import { IonApp, IonRouterOutlet } from "@ionic/vue";
+import { defineComponent } from "vue";
+import { useStore } from "vuex";
 export default defineComponent({
-  name: 'App',
+  name: "App",
   components: {
     IonApp,
-    IonRouterOutlet
-  }
+    IonRouterOutlet,
+  },
+
+  setup() {
+    const store = useStore();
+    store.dispatch("users");
+    store.dispatch("posts");
+  },
 });
 </script>
+
+<style>
+.ios {
+  font-family: "poppins";
+}
+.md {
+  font-family: "poppins";
+}
+h1,
+h2,
+h3,
+p {
+  font-family: "poppins";
+}
+
+.mosha__toast {
+  border-radius: 0 !important;
+  top: 0 !important;
+  max-width: 100% !important;
+  width: 100vw !important;
+}
+</style>
