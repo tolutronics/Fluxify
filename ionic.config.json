@@ -1,0 +1,7 @@
+{
+  "name": "fluxify",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue"
+}
