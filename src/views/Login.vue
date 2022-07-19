@@ -48,6 +48,7 @@ import { createToast } from "mosha-vue-toastify";
 import {
   signInWithEmail,
   getAllUsers,
+  getUserLikes,
 } from "@/services/supabase/supabaseClient";
 
 export default defineComponent({
@@ -71,17 +72,30 @@ export default defineComponent({
       console.log(loginForm);
       const { matric, password } = loginForm;
       const result = await signInWithEmail(matric.replace(/\//g, ""), password);
+      console.log(result);
 
-      const result2 = await getAllUsers();
       // console.log(result2.data);
-      loading.value = false;
+
       if (result.error) {
         createToast(result.error.message);
       } else {
+        const result3 = await getUserLikes(result.user?.id);
+        const result2 = await getAllUsers();
         if (!result2.error) {
           store.commit("setUsers", result2.data);
+          store.commit("setCurrentUser", result.user?.id);
+          if (!result3.error) {
+            store.commit("setUserLikes", result3.data);
+            router.replace("/tabs");
+            loading.value = false;
+          } else {
+            createToast("Connection Error");
+            loading.value = false;
+          }
+        } else {
+          createToast("Connection Error");
+          loading.value = false;
         }
-        router.replace("tabs");
       }
     };
 

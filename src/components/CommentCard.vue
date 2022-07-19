@@ -22,7 +22,7 @@
             </ion-card-header>
             <ion-card-content
               @click="setPost(comment)"
-              :router-link="`/post/${comment.id}`"
+              :router-link="`/post/${comment.commentId}`"
             >
               <p>
                 {{ comment.postText }}
@@ -93,6 +93,14 @@ import moment from "moment";
 import commonIonicComponents from "@/shared/common-ionic-components";
 import { getPost, setPost } from "@/shared/data.service";
 import { Comment } from "@/types/comments";
+import {
+  addLike,
+  getCommentsCount,
+  getLikesCount,
+  removeLike,
+} from "@/services/supabase/supabaseClient";
+import { onIonViewDidEnter } from "@ionic/vue";
+import { Like } from "@/types/like";
 export default defineComponent({
   name: "comment",
   props: {
@@ -107,9 +115,21 @@ export default defineComponent({
   setup(props) {
     const isLiked = ref(false);
     const store = useStore();
-
-    const likeToggle = () => {
+    const commentCount = ref(0);
+    const likeCount = ref(0);
+    const currentUser = computed(() => store.getters.currentUser);
+    const likeToggle = async () => {
       isLiked.value = !isLiked.value;
+      if (!isLiked) {
+        await removeLike("");
+      } else {
+        const likeData: Like = {
+          studentId: currentUser.value.studentId,
+          studentNumber: currentUser.value.studentNumber,
+          postId: props.comment.commentId,
+        };
+        await addLike(likeData);
+      }
     };
     const formatDate = (date: any) => {
       return moment(date).format("MMMM Do YYYY, h:mm:ss a");
@@ -123,11 +143,18 @@ export default defineComponent({
 
       return image;
     });
-    const commentCount = computed(() => {
-      return 30;
-    });
-    const likeCount = computed(() => {
-      return 10;
+    const getCommentCount = async () => {
+      commentCount.value = await getCommentsCount(props.comment.commentId);
+    };
+
+    const getLikeCount = async () => {
+      likeCount.value = await getLikesCount(props.comment.commentId);
+    };
+
+    onIonViewDidEnter(() => {
+      console.log("came here");
+      getCommentCount();
+      getLikeCount();
     });
 
     return {

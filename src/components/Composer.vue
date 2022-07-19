@@ -3,7 +3,7 @@
     <ion-header>
       <ion-toolbar class="ion-padding-start ion-padding-end">
         <ion-label slot="start" @click="closeModal">Close</ion-label>
-        <ion-label slot="end">Post</ion-label>
+        <ion-label slot="end" @click="makePost">Post</ion-label>
       </ion-toolbar>
     </ion-header>
     <ion-content>
@@ -29,6 +29,7 @@
             <ion-textarea
               :auto-grow="true"
               :autofocus="true"
+              v-model="postText"
               placeholder="What's on your mind"
             ></ion-textarea>
             <ion-row>
@@ -60,6 +61,8 @@ import { image, location, close, videocam, camera } from "ionicons/icons";
 import { modalController } from "@ionic/vue";
 import { ref, defineComponent } from "vue";
 import commonIonicComponents from "@/shared/common-ionic-components";
+import { Post } from "@/types/posts";
+import { useStore } from "vuex";
 export default defineComponent({
   name: "Posts",
   components: {
@@ -67,14 +70,35 @@ export default defineComponent({
   },
   setup() {
     const img = 4;
+    const postText = ref("");
+    const store = useStore();
+    const currentUser = store.getters.currentUser;
     const closeModal = async () => {
       await modalController.dismiss();
+    };
+
+    const makePost = async () => {
+      console.log(postText.value);
+      if (postText.value != "") {
+        const postData = [
+          {
+            postText: postText.value,
+            createdAt: new Date(),
+            studentId: currentUser.studentId,
+            studentNumber: currentUser.studentNumber,
+          },
+        ];
+        await modalController.dismiss(postData);
+      } else {
+      }
     };
     return {
       closeModal,
       image,
       camera,
+      makePost,
       location,
+      postText,
       img,
       close,
       videocam,

@@ -30,10 +30,9 @@
 <script lang="ts">
 import ChatList from "@/components/chatList.vue";
 import { chatboxOutline } from "ionicons/icons";
-import { ref, defineComponent } from "vue";
+import { ref, defineComponent, computed } from "vue";
 import { useStore } from "vuex";
 import commonIonicComponents from "@/shared/common-ionic-components";
-import { User } from "@/types/users";
 
 export default defineComponent({
   name: "Chat",
@@ -46,7 +45,7 @@ export default defineComponent({
     const store = useStore();
     const chatList: any = ref([]);
     const loaded = ref(false);
-    const currentUser: User = store.getters.currentUser;
+    const currentUser = computed(() => store.getters.currentUser);
 
     return {
       chatboxOutline,

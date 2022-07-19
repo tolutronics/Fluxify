@@ -13,7 +13,7 @@ export const postsMutations = {
       newArr.push(state.posts[property]);
     }
     posts.forEach((item) => {
-      newArr.push(item);
+      newArr.unshift(item);
     });
     state.posts = newArr;
   },

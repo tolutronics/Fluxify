@@ -1,7 +1,7 @@
 <template>
   <div id="container">
     <ion-grid fixed>
-      <ion-row>
+      <ion-row :class="post.postId ? 'realPost' : 'fakePost'">
         <ion-col size="2">
           <ion-avatar v-if="!face">
             <img v-if="posterImage" :src="posterImage" />
@@ -26,10 +26,7 @@
                 <ion-card-title v-if="!face">{{ posterName }} </ion-card-title>
               </div>
             </ion-card-header>
-            <ion-card-content
-              @click="setPost(post)"
-              :router-link="face ? '/post/face' : `/post/${post.id}`"
-            >
+            <ion-card-content @click="post.postId ? nextPage(post) : nothing">
               <p>
                 {{ post.postText }}
               </p>
@@ -65,7 +62,7 @@
                   class="darktheme"
                   :icon="shareSocial"
                 ></ion-icon>
-                <span class="likeCount">{{ commentCount }}</span>
+                <span class="likeCount">{{ getLikeCount }}</span>
               </div>
 
               <div>
@@ -75,7 +72,7 @@
                   :icon="chatbubbleOutline"
                   slot="end"
                 ></ion-icon>
-                <span slot="end" class="likeCount">{{ commentCount }}</span>
+                <span slot="end" class="likeCount">{{ getCommentCount }}</span>
               </div>
             </ion-card>
           </ion-card>
@@ -93,12 +90,21 @@ import {
   shareSocial,
 } from "ionicons/icons";
 
-import { ref, defineComponent, computed, PropType } from "vue";
+import { ref, defineComponent, computed, PropType, onMounted } from "vue";
 import { useStore } from "vuex";
 import moment from "moment";
 import { Post } from "@/types/posts";
 import commonIonicComponents from "@/shared/common-ionic-components";
 import { setPost } from "@/shared/data.service";
+import {
+  addLike,
+  getCommentsCount,
+  getLikesCount,
+  getSession,
+  removeLike,
+} from "@/services/supabase/supabaseClient";
+import { Like } from "@/types/like";
+import { useRouter } from "vue-router";
 export default defineComponent({
   name: "Posts",
   props: {
@@ -115,10 +121,58 @@ export default defineComponent({
     const isLiked = ref(false);
     const store = useStore();
     // console.log(props.post);
+    const router = useRouter();
+    const commentCount = ref(0);
+    const likeCount = ref(0);
 
-    const likeToggle = () => {
-      isLiked.value = !isLiked.value;
+    const currentUser = computed(() => store.getters.currentUser);
+    const likeToggle = async () => {
+      if (!props.post.postId) {
+        return;
+      }
+      console.log(isLiked.value);
+      if (isLiked.value) {
+        isLiked.value = false;
+        likeCount.value--;
+        const like = store.getters.likes.filter(
+          (x: Like) => x.postId == props.post.postId
+        );
+        const result = await removeLike(like[0]);
+        if (!result.error) {
+          store.commit("removeLike", result.data[0]);
+        }
+      } else {
+        likeCount.value++;
+        isLiked.value = true;
+        const likeData: Like = {
+          studentId: currentUser.value.studentId,
+          studentNumber: currentUser.value.studentNumber,
+          postId: props.post.postId,
+        };
+        const result = await addLike(likeData);
+        if (!result.error) {
+          store.commit("updateLike", result.data[0]);
+        }
+      }
     };
+    const nothing = () => {
+      //
+    };
+
+    const nextPage = (post: any) => {
+      console.log(props.post.postId);
+      if (props.post.postId) {
+        setPost(post);
+        if (props.face) {
+          router.push(`/post/face`);
+        } else {
+          router.push(`/post/${props.post.postId}`);
+        }
+      } else {
+        console.log("no data");
+      }
+    };
+
     const formatDate = (date: any) => {
       return moment(date).format("MMMM Do YYYY, h:mm:ss a");
     };
@@ -127,25 +181,32 @@ export default defineComponent({
     });
     const posterImage = computed(() => {
       const image = store.getters.posterImage(props.post);
-
       return image;
     });
-    const commentCount = computed(() => {
-      return 30;
-    });
-    const likeCount = computed(() => {
-      return 10;
+
+    const getCommentCount = computed(() => commentCount.value);
+
+    const getLikeCount = computed(() => likeCount.value);
+
+    onMounted(async () => {
+      isLiked.value = store.getters.isLiked(props.post.postId);
+      commentCount.value = await getCommentsCount(props.post.postId);
+      likeCount.value = await getLikesCount(props.post.postId);
     });
 
     return {
       heartOutline,
       chatbubbleOutline,
       heart,
+      nothing,
       shareSocial,
+      getCommentCount,
       posterName,
       posterImage,
       commentCount,
-      setPost,
+      getLikeCount,
+
+      nextPage,
       likeToggle,
       formatDate,
       likeCount,
@@ -160,6 +221,9 @@ export default defineComponent({
   /* background: red;
   padding: 2px;
   border-radius: 50%; */
+}
+.like {
+  color: var(--ion-color-primary);
 }
 ion-col > ion-avatar {
   height: 50px;
@@ -223,5 +287,12 @@ ion-card.card-footer {
 }
 ion-card.card-footer > div {
   display: flex;
+}
+.fakePost {
+  opacity: 0.3;
+}
+
+.realPost {
+  opacity: 1;
 }
 </style>

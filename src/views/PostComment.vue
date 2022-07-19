@@ -52,7 +52,6 @@ import { getPost } from "@/shared/data.service";
 import {
   commentOnPost,
   getPostComments,
-  getSession,
 } from "@/services/supabase/supabaseClient";
 import { createToast } from "mosha-vue-toastify";
 
@@ -72,13 +71,10 @@ export default defineComponent({
     //store.dispatch("news");
     const loading = ref(false);
     const comments = ref();
-    const currentUser = ref();
+
     const postId = route.params.uuid;
     const post: any = getPost();
-    getSession().then((res) => {
-      console.log(res);
-      currentUser.value = res;
-    });
+    const currentUser = computed(() => store.getters.currentUser);
     const loadData = (ev: any) => {
       setTimeout(() => {
         ev.target.complete();
@@ -88,11 +84,11 @@ export default defineComponent({
 
     const commentPost = async (ev: any) => {
       const result = await commentOnPost({
-        studentId: currentUser.value.user.id,
-        studentNumber: currentUser.value.user.user_metadata.studentNumber,
+        studentId: currentUser.value.studentId,
+        studentNumber: currentUser.value.studentNumber,
         photoUrl: null,
         postText: ev,
-        postId: post.id,
+        postId: post.commentId || post.postId,
       });
 
       if (!result.error) {
@@ -103,7 +99,7 @@ export default defineComponent({
 
     const getComments = async () => {
       loading.value = true;
-      const result = await getPostComments(post.id);
+      const result = await getPostComments(post.commentId || post.postId);
       loading.value = false;
       console.log(result);
       if (!result.error) {

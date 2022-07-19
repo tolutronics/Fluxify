@@ -1,8 +1,7 @@
-import store from "..";
+import { User } from "@/types/users";
 
 export const usersActions = {
-  async users({ commit }: any) {
-    commit("setUsers", "users");
-    store.dispatch("posts");
+  async users({ commit }: any, users: User) {
+    commit("setUsers", users);
   },
 };

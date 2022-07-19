@@ -6,5 +6,6 @@ export type Comment = {
   studentNumber: string;
   photoUrl?: string;
   postText?: string;
-  postId: number;
+  postId: string;
+  commentId: string;
 };

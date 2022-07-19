@@ -87,11 +87,20 @@ import {
   shareSocial,
 } from "ionicons/icons";
 
-import { ref, defineComponent, computed, PropType } from "vue";
+import { ref, defineComponent, computed, PropType, onMounted } from "vue";
 import { useStore } from "vuex";
 import moment from "moment";
 import { Post } from "@/types/posts";
 import commonIonicComponents from "@/shared/common-ionic-components";
+import {
+  addLike,
+  getCommentsCount,
+  getLikesCount,
+  getSession,
+  removeLike,
+} from "@/services/supabase/supabaseClient";
+import { onIonViewDidEnter } from "@ionic/vue";
+import { Like } from "@/types/like";
 export default defineComponent({
   name: "Posts",
   props: {
@@ -107,11 +116,40 @@ export default defineComponent({
   setup(props) {
     const isLiked = ref(false);
     const store = useStore();
+    const commentCount = ref(0);
+    const likeCount = ref(0);
     // console.log(props.post);
 
-    const likeToggle = () => {
-      isLiked.value = !isLiked.value;
+    const currentUser = computed(() => store.getters.currentUser);
+
+    const likeToggle = async () => {
+      console.log(isLiked.value);
+      if (isLiked.value) {
+        isLiked.value = false;
+        likeCount.value--;
+        const like = store.getters.likes.filter(
+          (x: Like) =>
+            x.postId == props.post.commentId || x.postId == props.post.postId
+        );
+        const result = await removeLike(like[0]);
+        if (!result.error) {
+          store.commit("removeLike", result.data[0]);
+        }
+      } else {
+        likeCount.value++;
+        isLiked.value = true;
+        const likeData: Like = {
+          studentId: currentUser.value.studentId,
+          studentNumber: currentUser.value.studentNumber,
+          postId: props.post.commentId || props.post.postId,
+        };
+        const result = await addLike(likeData);
+        if (!result.error) {
+          store.commit("updateLike", result.data[0]);
+        }
+      }
     };
+
     const formatDate = (date: any) => {
       return moment(date).format("MMMM Do YYYY, h:mm:ss a");
     };
@@ -123,11 +161,20 @@ export default defineComponent({
 
       return image;
     });
-    const commentCount = computed(() => {
-      return 30;
-    });
-    const likeCount = computed(() => {
-      return 10;
+    const getCommentCount = computed(() => commentCount.value);
+
+    const getLikeCount = computed(() => likeCount.value);
+
+    onMounted(async () => {
+      isLiked.value = store.getters.isLiked(
+        props.post.commentId || props.post.postId
+      );
+      commentCount.value = await getCommentsCount(
+        props.post.commentId || props.post.postId
+      );
+      likeCount.value = await getLikesCount(
+        props.post.commentId || props.post.postId
+      );
     });
 
     return {
@@ -137,6 +184,8 @@ export default defineComponent({
       shareSocial,
       posterName,
       posterImage,
+      getCommentCount,
+      getLikeCount,
       commentCount,
       likeToggle,
       formatDate,

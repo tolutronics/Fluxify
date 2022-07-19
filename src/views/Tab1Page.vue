@@ -3,18 +3,18 @@
     <ion-header class="ion-no-border">
       <ion-toolbar>
         <img
-          v-if="!currentUser.photourl"
+          v-if="!currentUser"
           class="simg"
           slot="start"
           alt=""
           src="@/assets/male.png"
         />
         <img
-          v-if="currentUser.photourl"
+          v-if="currentUser.photoUrl"
           class="simg"
           slot="start"
           alt=""
-          :src="currentUser.photourl"
+          :src="currentUser.photoUrl"
         />
         <ion-title>Fluxify</ion-title>
 
@@ -64,7 +64,12 @@ import { pencilOutline } from "ionicons/icons";
 import { useStore } from "vuex";
 import commonIonicComponents from "@/shared/common-ionic-components";
 import { User } from "@/types/users";
-import { getAllPosts, getSession } from "@/services/supabase/supabaseClient";
+import {
+  getAllPosts,
+  getSession,
+  savePostToDatabase,
+} from "@/services/supabase/supabaseClient";
+import { createToast } from "mosha-vue-toastify";
 
 export default defineComponent({
   name: "Home",
@@ -80,7 +85,7 @@ export default defineComponent({
     const noPost = ref(true);
     const facePosts = ref();
     const faceLoading = ref(true);
-    const currentUser: User = store.getters.currentUser;
+    const currentUser = computed(() => store.getters.currentUser);
 
     const loadData = (ev: any) => {
       setTimeout(() => {
@@ -119,7 +124,19 @@ export default defineComponent({
           title: "New Title",
         },
       });
-      await modal.present();
+      modal.present();
+
+      const { data } = await modal.onDidDismiss();
+      console.log(data);
+      if (data) {
+        store.commit("addPosts", data);
+        const result = await savePostToDatabase(data[0]);
+        if (!result.error) {
+          createToast("Post successful");
+          getPosts();
+        }
+      } else {
+      }
     };
 
     return {
@@ -129,6 +146,7 @@ export default defineComponent({
       faceLoading,
       facePosts,
       noPost,
+
       currentUser,
       composePost,
       posts,
